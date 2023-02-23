@@ -46,10 +46,13 @@ export function useAPIInfo () {
     }
 
     const qs = new URLSearchParams(location.search)
+    // 刷新时hostsStorage为空，所以在某些情况导致异常弹窗，做一点修改
+    // 只是一个应急方案，也许会和多个extrenalControllers的情况冲突，没有测试过。
+	 const savedConfig = JSON.parse(window.localStorage.getItem('externalControllers'))?.[0]
 
-    const hostname = qs.get('host') ?? hostsStorage?.[hostSelectIdxStorage]?.hostname ?? url?.hostname ?? '127.0.0.1'
-    const port = qs.get('port') ?? hostsStorage?.[hostSelectIdxStorage]?.port ?? url?.port ?? '9090'
-    const secret = qs.get('secret') ?? hostsStorage?.[hostSelectIdxStorage]?.secret ?? url?.username ?? ''
+    const hostname = qs.get('host') ?? savedConfig?.hostname ?? url?.hostname ?? '127.0.0.1'
+    const port = qs.get('port') ?? savedConfig?.port ?? url?.port ?? '9090'
+    const secret = qs.get('secret') ?? savedConfig?.secret ?? url?.username ?? ''
     const protocol = qs.get('protocol') ?? hostname === '127.0.0.1' ? 'http:' : (url?.protocol ?? window.location.protocol)
 
     return { hostname, port, secret, protocol }
